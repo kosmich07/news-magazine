@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+
+		<!-- Bootstrap -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<title>News</title>
+
+		<!-- Google Webfont -->
+	<link href='http://fonts.googleapis.com/css?family=Open Sans:400,300,700|Unica+One' rel='stylesheet' type='text/css'>
+		<!-- Main Css -->
+	<link rel="stylesheet" href="css/style.css">
+		<!-- Icomoon Icons -->
+	<link rel="stylesheet" href="css/icomoon-icons.css">
+	<script src="js/main.js"></script>
+
+	</head>
+	<body onload ="getListNews()">
+	
+	<!--HEADER-->
+	
+		<div class="container mainwrap">
+		<div class="disableBody">
+			<div class="emptydiv50"></div>
+			<div class="row">
+				<div class="col-sm-8 col-md-6 col-xs-12 logowrap">
+					<a href="index.html" ><p>NEWS<span>CENTRAL</span></p></a>
+
+				</div>
+				<div class="col-sm-4 col-md-6 col-xs-12 usermenuwrap">
+					
+			      <div class = "col-sm-4  usermenunav">
+				      <span>View Type</span>
+				      <div class="usermenu ">
+				      	<span class="usermenunavitem">
+				      		<i class="icon-view_module"></i>
+				      	</span>
+				      	<span class="usermenunavitem">
+				      		<i class="icon-view_list"></i>
+				      	</span>
+				      </div>
+				      </div>
+				  <div class = "col-sm-4 usermenunav">
+				 		<span class="usermenunavitem">
+				      		<i class="icon-bookmark"></i>
+				      	</span>
+				     <a href="bookmarks.html"> <span>My Bookmarks</span></a>
+				      <div >
+				      	<span class="usermenunavitem">350</span>
+				      </div>
+				      </div>
+				  <div class = "col-sm-4 usermenunav">
+				      <span>Matthew Potter</span>
+				      <div >
+				      	<span class="usermenunavitem">News Viewed - 3561</span>
+				      	<div clas="photoholder"></div>
+				      </div>
+			      </div>
+				</div>
+				
+
+			</div>
+		</div>
+		<div class="emptydiv50"></div>
+	<!--HEADER-->
+	<!--MAIN BLOCK-->
+	<div class="iframe-wrap hidenIframe">
+		<div class="closeButton" onclick="closeIframe()"><p>Close Me<p></div>
+		<iframe ></iframe>
+	</div>
+		<div class="container wrapmainblock">
+			<div class="row">
+				<div class="col-sm-4 leftsidebar">
+					<div  class="categorywrap">
+						<div  id="listOfNews"></div>
+					</div>
+				</div>
+				<div class="col-sm-8 rightside">
+					<div id="main-wrap"></div>
+				</div>
+			</div>
+		</div>
+	<!--MAIN BLOCK-->
+	
+	</div>
+	</body>
+	</html>

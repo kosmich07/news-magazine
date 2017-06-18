@@ -23,6 +23,7 @@ function handleResponse (news) {
 	var objNews = JSON.parse(news);
 
 
+
 //parse news items into object
 //choose function to put news in accordance with category
 			
@@ -59,6 +60,33 @@ function handleResponse (news) {
 
 }
 
+function handleOtherNews (news) {
+	var listWrap = document.getElementById("main-sec-wrap");
+
+	listWrap.innerHTML='';
+	var listNews = JSON.parse(news);
+
+	var processingFunction = lowNewsBlock;
+	listWrap.innerHTML += "<div class='topnewsTitle '>Top News</div>"
+	for (var i =0 ; i <listNews.articles.length; i++) {
+		var oneRow = processingFunction(listNews.articles[i]);
+
+		listWrap.appendChild(oneRow);
+
+	}
+
+}
+
+function lowNewsBlock (newsRow) {
+	var divWithNews = document.createElement("div");
+	divWithNews.classList.add('listRow', 'newsSourceItem');
+
+	divWithNews.innerHTML += "<a class='newsLink resourceURL' onclick='openIframe(this)' href='#' data-newsurl="+newsRow.url+"><span>"+newsRow.title+"</span></a>";
+	return divWithNews;
+}
+
+
+
 function arrayNews(newsDiv) {
 // create new div with news
 	var divWithNews = document.createElement("div");
@@ -74,7 +102,7 @@ function arrayNews(newsDiv) {
 //create new span with date of published
 	divWithNews.innerHTML += "<span class='publishDate'>"+newsDiv.publishedAt+"</span>";
 
-//create new global link with date article link
+//create new global link with 		date article link
 	
 //return div with news in the handleResponse function
 	return divWithNews;
@@ -85,7 +113,10 @@ function arrayNewsBusiness(newsDiv) {
 	var divWithNews = document.createElement("div");
 	divWithNews.classList.add('business','newscard');
 	divWithNews.setAttribute('data-position', arrayNewsBookmark.length);
-	divWithNews.innerHTML += "<div class='bookmark-btn' data-position="+arrayNewsBookmark.length+" onclick='saveNews(this)'><i class='icon-bookmark absolute-bookmark'></i></div>";
+// function to mark bookmark blue
+	var bookMarkClass = retreiveBookmarks(newsDiv.url);
+
+	divWithNews.innerHTML += "<div class='bookmark-btn "+bookMarkClass+" ' data-position="+arrayNewsBookmark.length+" onclick='saveNews(this)'><i class='icon-bookmark absolute-bookmark'></i></div>";
 	divWithNews.innerHTML +=  "<img class='newsPic' alt='No Image' src=" + newsDiv.urlToImage + " />";
 	divWithNews.innerHTML += "<a class='newsLink' onclick='openIframe(this)' href='#' data-newsurl="+newsDiv.url+"><span>"+newsDiv.title+"</span></a>";
 	divWithNews.innerHTML += "<div class='descriptionDiv'>"+newsDiv.description+"</div>";
@@ -94,6 +125,7 @@ function arrayNewsBusiness(newsDiv) {
 	
 	
 	return divWithNews;
+	
 }
 
 // function for entertainment cards
@@ -231,6 +263,7 @@ function listAllNewsRes (list) {
 	}
 
 	httpGetAsync("https://newsapi.org/v1/articles?source="+allResNewsObj.sources[0].id+"&sortBy=top&apiKey=4364e754d4084e4ca851af2a225ab93d", handleResponse);
+	httpGetAsync("https://newsapi.org/v1/articles?source="+allResNewsObj.sources[0].id+"&sortBy=top&apiKey=4364e754d4084e4ca851af2a225ab93d", handleOtherNews);
 
 
 }
@@ -254,6 +287,7 @@ function getId (link) {
 	clickedSource = link.dataset.category;
 //add news recorce id to link (for receive news)
 	httpGetAsync("https://newsapi.org/v1/articles?source="+clickedLinked+"&sortBy=top&apiKey=4364e754d4084e4ca851af2a225ab93d", handleResponse);
+	httpGetAsync("https://newsapi.org/v1/articles?source="+clickedLinked+"&sortBy=top&apiKey=4364e754d4084e4ca851af2a225ab93d", handleOtherNews);
 }
 
 
@@ -273,7 +307,9 @@ function openIframe (link) {
 	document.getElementsByClassName("iframe-wrap")[0].classList.remove("hidenIframe");
 //add active class to iframe
 	document.getElementsByClassName("iframe-wrap")[0].classList.add("active");	
-	//document.getElementsByClassName("disableBody")[0].style.display = 'block';		
+	document.getElementsByClassName("disableBody")[0].style = "background: grey; "	
+	document.querySelector("div[class*='wrapmainblock']").style = "opacity: 0.6;"	
+
 
 }
 
@@ -287,6 +323,8 @@ function closeIframe() {
 //add class hiden to iframe div
 	document.getElementsByClassName("iframe-wrap")[0].classList.remove("active");
 	document.getElementsByClassName("iframe-wrap")[0].classList.add("hidenIframe");
+		document.getElementsByClassName("disableBody")[0].style = "background: none; "	
+	document.querySelector("div[class*='wrapmainblock']").style = "opacity: 1;"	
 }
 
 //function to save news
@@ -294,14 +332,20 @@ function saveNews(link) {
 
 // check # of the news in the array
 	var checkedNewsNumber = link.dataset.position;
-//add style to bookmark icon
-	link.classList.add("activeNew");
+
+//add style to bookmark icon - push function to return activeNew or empty string
+	//var bookCheck = retreiveBookmarks(arrayNewsBookmark[checkedNewsNumber].url);
+
+//declare div that is checked 
+	var checkedBlock = document.querySelector("div[class*='bookmark-btn'][data-position='"+checkedNewsNumber+"']");
+	console.log(checkedBlock);
+	checkedBlock.classList.toggle('activeNew');
 
 
 
-//declare old values in localstorage
+//get old values from localstorage
 	var oldOne = localStorage.getItem('bookmarks');
-	var oldBookColor = localStorage.getItem('color');
+
 	var oldNews;
 // check if the object empty
 	if (oldOne!==null&&oldOne!==undefined) {
@@ -309,7 +353,8 @@ function saveNews(link) {
 	} else {
 		oldNews=[];
 	}	
-	console.log(oldNews);
+
+
 	var existedNews = false;
 //need to check if the news is alredy in bookmarks by url
 	for (var i = 0; i < oldNews.length; i++) {
@@ -347,6 +392,7 @@ function saveNews(link) {
 function retrieveBookmarks () {
 	var oldOne = localStorage.getItem('bookmarks');
 	var oldNews;
+	arrayNewsBookmark= [];
 
 
 // check if the object empty
@@ -359,6 +405,7 @@ function retrieveBookmarks () {
 	var newsDiv = document.getElementById("bookmark");
 	for (var i =0; i < oldNews.length; i++) {
 		var oneDiv = arrayNewsBookmarkFunc(oldNews[i]);
+		arrayNewsBookmark.push(oldNews[i]);
 // error on null url
 		if (oldNews[i] == null) {continue;}
 //use variable with assigned function exatly like this is a function
@@ -372,13 +419,41 @@ var numBook;
    	numBook=0;
    }
 
-	document.getElementById('numbookmarks').innerHTML=numBook;
+
+document.getElementById('numbookmarks').innerHTML=numBook;
+	
 }
 
-// function for bookmark cards
+function retreiveBookmarks (url) {
+//get old items from local storage
+	var oldBookmarks= localStorage.getItem("bookmarks");
+//parse old bookmarks from JSON
+	// check if the object empty
+	var OldOne;
+	if (oldBookmarks!==null&&oldBookmarks!==undefined) {
+		 OldOne = JSON.parse(oldBookmarks);
+	} else {
+		OldOne=[];
+	}	
+
+	
+//iterate each article to check already existed URL
+	for (var i = 0; i < OldOne.length; i++) {
+//push each old url into object
+		var existedURL = OldOne[i].url;
+
+		if (existedURL == url) {
+			return "activeNew";
+		}
+	}
+	return "";
+}
+
 function arrayNewsBookmarkFunc(newsDiv) {
 	var divWithNews = document.createElement("div");
 	divWithNews.classList.add('business','newscard');
+	var bookMarkClass = retreiveBookmarks(newsDiv.url);
+	divWithNews.innerHTML += "<div class='bookmark-btn "+bookMarkClass+" ' data-position="+arrayNewsBookmark.length+" onclick='saveNews(this)'><i class='icon-bookmark absolute-bookmark'></i></div>";
 	
 	divWithNews.innerHTML +=  "<img class='newsPic' src=" + newsDiv.urlToImage + " />";
 	divWithNews.innerHTML += "<a class='newsLink' onclick='openIframe(this)' href='#' data-newsurl="+newsDiv.url+"><span>"+newsDiv.title+"</span></a>";
